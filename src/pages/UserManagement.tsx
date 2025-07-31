@@ -338,15 +338,22 @@ const {
       (field) => field.toLowerCase().includes(search.toLowerCase())
     );
     const matchesRole = roleFilter === "All" || user.role === roleFilter;
-    const matchesDept = deptFilter === "All" || user.dept === deptFilter;
+    const matchesDept = deptFilter === "All" || user.department === deptFilter;
     return matchesSearch && matchesRole && matchesDept;
   });
 
-  const totalPages = Math.ceil(filteredData?.length / perPage);
+  const totalPages = Math.max(1, Math.ceil((filteredData?.length || 0) / perPage));
   const paginatedData = (filteredData ?? []).slice(
     (page - 1) * perPage,
     page * perPage
   );
+
+  // Reset page to 1 if current page is greater than total pages
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(1);
+    }
+  }, [totalPages, page]);
 
   useEffect(() => {
     console.log("Fetched Users:", data?.users);
